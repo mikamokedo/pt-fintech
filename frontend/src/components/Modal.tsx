@@ -1,6 +1,6 @@
-import React from 'react';
-import { FieldErrors, UseFormRegister } from 'react-hook-form';
-import { FormTaskData } from './Header';
+import React from "react";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
+import { FormTaskData } from "./Header";
 
 interface ModalProps {
   errors: FieldErrors<FormTaskData>;
@@ -8,12 +8,7 @@ interface ModalProps {
   register: UseFormRegister<FormTaskData>;
   handleClose: () => void;
 }
-const Modal: React.FC<ModalProps> = ({
-  errors,
-  register,
-  handleSubmit,
-  handleClose,
-}) => {
+const Modal: React.FC<ModalProps> = ({ errors, register, handleSubmit, handleClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-[rgba(0,0,0,0.3)]">
       <div className="bg-gray-200 rounded-lg p-8 w-1/2 relative">
@@ -28,30 +23,25 @@ const Modal: React.FC<ModalProps> = ({
           <input
             className="border border-gray-300 rounded-lg p-2"
             placeholder="Title"
-            {...register('title', { required: true })}
+            {...register("title", { required: true })}
           />
-          {errors.title && (
-            <span className="text-red-500 text-sm">Title is required</span>
-          )}
+          {errors.title && <span className="text-red-500 text-sm">Title is required</span>}
           <textarea
-            {...register('description', { required: true })}
+            {...register("description", { required: true })}
             className="border border-gray-300 rounded-lg p-2 mt-4"
             placeholder="Description"
           />
-          {errors.description && (
-            <span className="text-red-500 text-sm">
-              Description is required
-            </span>
-          )}
+          {errors.description && <span className="text-red-500 text-sm">Description is required</span>}
           <input
-            {...register('date', { required: false })}
+            {...register("dueDate", { required: true })}
             type="date"
-            className="border border-gray-300 rounded-lg p-2 mt-4 mb-4"
+            className="border border-gray-300 rounded-lg p-2 mt-4"
             placeholder="Title"
           />
+          {errors.dueDate && <span className="text-red-500 text-sm">Due Date is required</span>}
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2  mt-4"
           >
             Submit
           </button>

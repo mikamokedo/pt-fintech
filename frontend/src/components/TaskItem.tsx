@@ -1,7 +1,7 @@
-import React from 'react';
-import { Task } from '../hooks/AuthContext';
-import { useDrag } from 'react-dnd';
-import DeletePopup from './DeletePopup';
+import React from "react";
+import { Task } from "../hooks/AuthContext";
+import { useDrag } from "react-dnd";
+import DeletePopup from "./DeletePopup";
 
 interface TaskItemProps {
   task: Task;
@@ -11,14 +11,13 @@ interface TaskItemProps {
 const TaskItem: React.FC<TaskItemProps> = ({ task, onClick, onDelete }) => {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = React.useState(false);
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'task',
+    type: "task",
     item: { id: task.id },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   }));
-  const isFutureDate =
-    task.date && new Date(task.date).getTime() < new Date().getTime();
+  const isFutureDate = task.dueDate && new Date(task.dueDate).getTime() < new Date().getTime();
 
   return (
     <div
@@ -29,26 +28,16 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onClick, onDelete }) => {
       }}
     >
       {isDeletePopupOpen && (
-        <DeletePopup
-          onConfirm={() => onDelete(task.id)}
-          onCancel={() => setIsDeletePopupOpen(false)}
-        />
+        <DeletePopup onConfirm={() => onDelete(task.id)} onCancel={() => setIsDeletePopupOpen(false)} />
       )}
 
-      <div
-        className="absolute right-2 top-2"
-        onClick={() => setIsDeletePopupOpen(true)}
-      >
+      <div className="absolute right-2 top-2" onClick={() => setIsDeletePopupOpen(true)}>
         <img src="/delete.svg" width={20} />
       </div>
       <div onClick={() => onClick(task.id)}>
         <div className="font-medium mb-2">{task.title}</div>
         <div className="text-sm">{task.description}</div>
-        <div
-          className={`text-xs text-right ${isFutureDate ? 'text-red-500' : ''}`}
-        >
-          {String(task?.date)}
-        </div>
+        <div className={`text-xs text-right ${isFutureDate ? "text-red-500" : ""}`}>{task.dueDate?.toString()}</div>
       </div>
     </div>
   );

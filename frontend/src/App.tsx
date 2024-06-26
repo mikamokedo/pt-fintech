@@ -1,18 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import { AuthProvider } from './hooks/AuthContext';
-import { Suspense } from 'react';
-import Loading from './components/Loading';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import { AuthProvider } from "./hooks/AuthContext";
+import { Suspense } from "react";
+import Loading from "./components/Loading";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <Router>
       <Suspense fallback={<Loading />}>
         <AuthProvider>
+          <ToastContainer />
           <Routes>
             <Route
               path="/"

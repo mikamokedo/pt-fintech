@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface DeletePopupProps {
   onConfirm: () => void;
@@ -14,6 +14,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({ onConfirm, onCancel }) => {
             type="button"
             className="text-gray-400 absolute top-2.5 right-2.5 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
             data-modal-toggle="deleteModal"
+            onClick={onCancel}
           >
             <svg
               aria-hidden="true"
@@ -43,9 +44,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({ onConfirm, onCancel }) => {
               clip-rule="evenodd"
             ></path>
           </svg>
-          <p className="mb-4 text-gray-500 dark:text-gray-300">
-            Are you sure you want to delete this item?
-          </p>
+          <p className="mb-4 text-gray-500 dark:text-gray-300">Are you sure you want to delete this item?</p>
           <div className="flex justify-center items-center space-x-4">
             <button
               onClick={onCancel}

@@ -1,9 +1,11 @@
-import React from 'react';
+import React from "react";
+import { User } from "../hooks/AuthContext";
+import { useAuthContext } from "../hooks/AuthContext";
 
 export interface FormTaskData {
   title: string;
   description: string;
-  date: Date;
+  dueDate: Date;
 }
 
 interface HeaderProps {
@@ -11,12 +13,10 @@ interface HeaderProps {
   setSearch: (search: string) => void;
   createTasks: (task: FormTaskData) => void;
   setIsCreateTaskModalOpen: (isOpen: boolean) => void;
+  currentUser: User | null;
 }
-const Header: React.FC<HeaderProps> = ({
-  search,
-  setSearch,
-  setIsCreateTaskModalOpen,
-}) => {
+const Header: React.FC<HeaderProps> = ({ search, setSearch, setIsCreateTaskModalOpen, currentUser }) => {
+  const { logout } = useAuthContext();
   return (
     <div className="flex justify-between p-5 bg-gray-100">
       <div>
@@ -28,12 +28,21 @@ const Header: React.FC<HeaderProps> = ({
           placeholder="task name"
         />
       </div>
-      <button
-        onClick={() => setIsCreateTaskModalOpen(true)}
-        className="w-[200px] text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-      >
-        Create new task
-      </button>
+      <div className="flex gap-5 items-center">
+        <button
+          onClick={() => setIsCreateTaskModalOpen(true)}
+          className="w-[200px] text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        >
+          Create new task
+        </button>
+        <div className="flex gap-4 items-center">
+          <p className="font-bold">{currentUser?.username}</p>
+
+          <button className="w-5" onClick={logout}>
+            <img src="/turn-off.svg" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

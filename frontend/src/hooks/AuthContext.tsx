@@ -1,16 +1,13 @@
-import React, {
-  createContext,
-  useState,
-  ReactNode,
-  useContext,
-  useEffect,
-} from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useState, ReactNode, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../services/backendServices";
+import { getProfileService } from "../services/auth.services";
+import Loading from "../components/Loading";
 
 export enum TaskStatus {
-  TODO = 'TODO',
-  IN_PROGRESS = 'IN_PROGRESS',
-  DONE = 'DONE',
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
 }
 
 export interface User {
@@ -24,137 +21,72 @@ export interface Task {
   description: string;
   status: TaskStatus;
   id: string;
-  date?: Date;
+  dueDate: Date;
 }
 
 interface AuthContextProps {
-  login: (username: string, task: Task[]) => void;
+  login: (user: User) => void;
   logout: () => void;
-  userName: string;
-  tasks: Task[];
-  handleUpdateTask: (task: Task) => void;
-  handleCreateTask: (task: Task) => void;
-  handleDeleteTask: (task: string) => void;
+  currentUser: User | null;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   login: () => {},
   logout: () => {},
-  userName: '',
-  tasks: [],
-  handleUpdateTask: () => {},
-  handleCreateTask: () => {},
-  handleDeleteTask: () => {},
+  currentUser: null,
 });
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [userName, setUserName] = useState<string>('');
+export interface User {
+  username: string;
+  email: string;
+  role: string;
+}
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [currentUser, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const login = (username: string, tasks: Task[]) => {
-    setUserName(username);
-    setTasks(tasks);
-    localStorage.setItem('user', JSON.stringify(username));
+  const login = (user: User) => {
+    setUser(user);
   };
 
   const logout = () => {
-    setUserName('');
-    setTasks([]);
-    localStorage.removeItem('user');
-  };
-
-  const handleUpdateTask = (task: Task) => {
-    const newTasks = tasks.map((t) => {
-      if (t.id === task.id) {
-        return task;
-      }
-      return t;
-    });
-    setTasks(newTasks);
-    const localStorageUSers = localStorage.getItem('users');
-    if (localStorageUSers) {
-      const users = JSON.parse(localStorageUSers);
-
-      const newUsers = users.map((user: User) => {
-        if (user.username === userName) {
-          return { ...user, tasks: newTasks };
-        }
-        return user;
-      });
-      localStorage.setItem('users', JSON.stringify(newUsers));
-    }
-  };
-
-  const handleCreateTask = (task: Task) => {
-    const newTasks = [...tasks, task];
-    setTasks(newTasks);
-    const localStorageUSers = localStorage.getItem('users');
-    if (localStorageUSers) {
-      const users = JSON.parse(localStorageUSers);
-
-      const newUsers = users.map((user: User) => {
-        if (user.username === userName) {
-          return { ...user, tasks: newTasks };
-        }
-        return user;
-      });
-      localStorage.setItem('users', JSON.stringify(newUsers));
-    }
-  };
-
-  const handleDeleteTask = (id: string) => {
-    const newTasks = tasks.filter((task) => task.id !== id);
-    setTasks(newTasks);
-    const localStorageUSers = localStorage.getItem('users');
-    if (localStorageUSers) {
-      const users = JSON.parse(localStorageUSers);
-
-      const newUsers = users.map((user: User) => {
-        if (user.username === userName) {
-          return { ...user, tasks: newTasks };
-        }
-        return user;
-      });
-      localStorage.setItem('users', JSON.stringify(newUsers));
-    }
+    setUser(null);
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   useEffect(() => {
-    const localStorageUSers = localStorage.getItem('users');
-    const currentUser = localStorage.getItem('user');
-    if (currentUser) {
-      setUserName(JSON.parse(currentUser));
-      if (localStorageUSers) {
-        const users = JSON.parse(localStorageUSers);
-        const user = users.find(
-          (user: User) => user.username === JSON.parse(currentUser)
-        );
-        if (user) {
-          setTasks(user.tasks);
-        }
-        navigate('/');
-      }
-    } else {
-      navigate('/login');
+    setIsLoading(true);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsLoading(false);
+      navigate("/login");
+      return;
     }
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    getProfileService()
+      .then((user) => {
+        setIsLoading(false);
+        setUser(user);
+        navigate("/");
+      })
+      .catch(() => {
+        setIsLoading(false);
+        navigate("/login");
+      });
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
-        userName,
+        currentUser,
         login,
         logout,
-        tasks,
-        handleUpdateTask,
-        handleCreateTask,
-        handleDeleteTask,
       }}
     >
-      {children}
+      {isLoading ? <Loading /> : children}
     </AuthContext.Provider>
   );
 };

@@ -1,0 +1,20 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: todos
+    ports:
+      - '5433:5432'
+  # app:
+  #   build: .
+  #   command: npm run start:dev
+  #   volumes:
+  #     - .:/usr/src/app
+  #   ports:
+  #     - '3000:3000'
+  #   depends_on:
+  #     - db
